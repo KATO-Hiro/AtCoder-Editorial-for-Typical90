@@ -13,8 +13,8 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
+(function () {
+    "use strict";
 
     const url = "";
     addEditorialTabToTaskPage(url);
@@ -25,7 +25,7 @@
 
     // See:
     // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-    $editorialButton.addEventListener('click', async e => {
+    $editorialButton.addEventListener("click", async e => {
         e.preventDefault();
 
         console.log("called!");
@@ -47,11 +47,11 @@ function addEditorialButtonToTaskPage() {
     // See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-    const editorialButton = document.createElement('a');
-    editorialButton.classList.add('btn', 'btn-default', 'btn-sm');
-    editorialButton.textContent = '解説';
+    const editorialButton = document.createElement("a");
+    editorialButton.classList.add("btn", "btn-default", "btn-sm");
+    editorialButton.textContent = "解説";
 
-    const taskTitle = document.querySelector('.row > div > .h2');
+    const taskTitle = document.querySelector(".row > div > .h2");
 
     if (taskTitle) {
         taskTitle.appendChild(editorialButton);
