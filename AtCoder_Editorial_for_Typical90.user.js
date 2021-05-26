@@ -16,6 +16,9 @@
 (function() {
     'use strict';
 
+    const url = "";
+    addEditorialTabToTaskPage(url);
+
     const $editorialButton = addEditorialButtonToTaskPage();
 
     if (!$editorialButton) return;
@@ -33,6 +36,12 @@
         // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
     });
 })();
+
+function addEditorialTabToTaskPage(url) {
+    // See:
+    // https://api.jquery.com/before/
+    $("li.pull-right").before("<li><a href='" + url + "'><span class='glyphicon glyphicon-book' style='margin-right:4px;' aria-hidden='true'></span>解説</a></li>");
+}
 
 function addEditorialButtonToTaskPage() {
     // See:
