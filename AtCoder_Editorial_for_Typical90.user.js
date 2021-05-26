@@ -3,8 +3,8 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1.0
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんのGitHubで公開されている問題の解説・想定ソースコードなどを表示します。
-// @match        https://atcoder.jp/contests/*/standings*
-// @require      https://code.jquery.com/jquery-3.4.1.min.js
+// @match        https://atcoder.jp/contests/typical90/tasks/typical90_*
+// @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @author       hiro_hiro
 // @license      CC0
 // @downloadURL
