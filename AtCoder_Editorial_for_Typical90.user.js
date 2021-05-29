@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1.0
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんのGitHubで公開されている問題の解説・想定ソースコードなどを表示します。
-// @match        https://atcoder.jp/contests/typical90/tasks/typical90_*
+// @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @require      https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js
 // @require      https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js
@@ -21,22 +21,26 @@
     const url = "";
     addEditorialTabToTaskPage(url);
 
-    const $editorialButton = addEditorialButtonToTaskPage();
+    const current_url = window.location.href;
 
-    if (!$editorialButton) return;
+    if (current_url.match("/atcoder.jp\/contests\/typical90\/tasks\/typical90_*")) {
+        const $editorialButton = addEditorialButtonToTaskPage();
 
-    // See:
-    // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-    $editorialButton.addEventListener("click", async e => {
-        e.preventDefault();
+        if (!$editorialButton) return;
 
-        console.log("called!");
-        // TODO: ボタンをクリックすると、解説ページが作成される
-        // TODO: 解説ページに、その問題の解説を追加
-        // TODO: 解説ページに、その問題のソースコードを追加
-        // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
-        // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
-    });
+        // See:
+        // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+        $editorialButton.addEventListener("click", async e => {
+            e.preventDefault();
+
+            console.log("called!");
+            // TODO: ボタンをクリックすると、解説ページが表示される
+            // TODO: 解説ページに、その問題の解説を追加
+            // TODO: 解説ページに、その問題のソースコードを追加
+            // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
+            // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
+        });
+    }
 })();
 
 function addEditorialTabToTaskPage(url) {
