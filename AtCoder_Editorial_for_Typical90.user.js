@@ -5,6 +5,8 @@
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんのGitHubで公開されている問題の解説・想定ソースコードなどを表示します。
 // @match        https://atcoder.jp/contests/typical90/tasks/typical90_*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @require      https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js
+// @require      https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js
 // @author       hiro_hiro
 // @license      CC0
 // @downloadURL
