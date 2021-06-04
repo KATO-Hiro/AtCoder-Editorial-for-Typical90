@@ -17,7 +17,7 @@
     "use strict";
 
     addTabContentStyles();
-    addEditorialTabToTaskPage();
+    addEditorialTab();
     addEditorialPage();
 
     $(".nav-tabs a").click(function () {
@@ -41,10 +41,6 @@
 
             console.log("called!");
             // TODO: ボタンをクリックすると、解説ページが表示される
-            // TODO: 解説ページに、その問題の解説を追加
-            // TODO: 解説ページに、その問題のソースコードを追加
-            // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
-            // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
         });
     }
 })();
@@ -63,13 +59,43 @@ function addTabContentStyles() {
 }
 
 // FIXME: Hard coding is not good.
-function addEditorialTabToTaskPage() {
+function addEditorialTab() {
     // See:
     // https://api.jquery.com/before/
     $("li.pull-right").before("<li><a href='#editorial-created-by-userscript'><span class='glyphicon glyphicon-book' style='margin-right:4px;' aria-hidden='true'></span>解説</a></li>");
 }
 
 function addEditorialPage() {
+    addTabContent();
+
+    const editorialID = "#editorial-created-by-userscript";
+
+    showHeader(editorialID);
+    addHorizontalRule(editorialID);
+
+    // TODO: 問題の一覧を取得
+    // TODO: 問題名を動的に変更
+    // TODO: 問題名に対応したURLを追加
+    const taskName = "FIXME: 問題名";
+    showTaskName(taskName, editorialID);
+
+    const githubRepoUrl = "https://github.com/E869120/kyopro_educational_90/blob/main/";
+
+    // TODO: 問題解説のURLを動的に変更
+    // TODO: 問題解説のJPEGファイルを表示
+    const editorialsUrl = githubRepoUrl + "editorial/";
+    const EditorialUrl = editorialsUrl + "053-04" + ".jpg";
+    showEditorials(EditorialUrl, editorialID);
+
+    // TODO: ソースコードをフォーマットされた状態で表示する
+    // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
+    // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
+    const CodesUrl = githubRepoUrl + "sol/";
+    const editoriaCodelUrl = CodesUrl + "053-04" + ".cpp";
+    showCodes(editoriaCodelUrl, editorialID);
+}
+
+function addTabContent() {
     const contestNavTabsId = document.getElementById("contest-nav-tabs");
 
     // See:
@@ -79,11 +105,63 @@ function addEditorialPage() {
         class: "tabContent",
         id: "editorial-created-by-userscript",
     }).appendTo(contestNavTabsId);
+}
 
+function showHeader(tag) {
     $("<h2>", {
         class: "editorial-header",
         text: "解説"
-    }).appendTo("#editorial-created-by-userscript");
+    }).appendTo(tag);
+}
+
+function addHorizontalRule(tag) {
+    // See:
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr
+    $("<hr>", {
+        class: "",
+    }).appendTo(tag);
+}
+
+function showTaskName(taskName, tag) {
+    $("<h3>", {
+        class: "task-name",
+        text: taskName,
+    }).appendTo(tag);
+}
+
+function showEditorials(url, tag) {
+    $("<ul>", {
+        class: "editorial-ul",
+        text: ""
+    }).appendTo(tag);
+
+    $("<li>", {
+        class: "editorial-li",
+        text: ""
+    }).appendTo(".editorial-ul");
+
+    $("<a>", {
+        class: "editorial-url",
+        href: url,
+        text: "公式解説",
+        target: "_blank",
+        rel: "noopener",
+    }).appendTo(".editorial-li");
+}
+
+function showCodes(url, tag) {
+    $("<li>", {
+        class: "editorial-code-li",
+        text: ""
+    }).appendTo(".editorial-ul");
+
+    $("<a>", {
+        class: "editorial-code-url",
+        href: url,
+        text: "想定ソースコード",
+        target: "_blank",
+        rel: "noopener",
+    }).appendTo(".editorial-code-li");
 }
 
 function addEditorialButtonToTaskPage() {
