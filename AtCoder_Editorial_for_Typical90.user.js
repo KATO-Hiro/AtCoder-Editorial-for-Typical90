@@ -79,21 +79,33 @@ function addEditorialPage() {
     const codesUrl = githubRepoUrl + "sol/";
 
     // TODO: 問題の一覧を取得
-    // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
     // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
+    // 問題によっては、複数の解説とソースコードが公開される日もある
+    // getMultipleEditorialUrlsIfNeeds()とgetMultipleCodeUrls()で、アドホック的に対処している
     for (let i = 1; i <= 90; i++ ) {
         // See:
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+        // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
         const taskId = String(i).padStart(3, "0");
         showTaskName(taskId, editorialId);
 
+        const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
+
         // TODO: AtCoderの解説ページで図を表示できるようにする
-        const editorialUrl = editorialsUrl + taskId + ".jpg";
-        showEditorial(taskId, editorialUrl, editorialId);
+        for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
+            const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
+            showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, editorialId);
+        }
+
+        const codeUrls = getMultipleCodeUrls(taskId);
 
         // TODO: ソースコードをフォーマットされた状態で表示する
-        const editorialCodelUrl = codesUrl + taskId + ".cpp";
-        showCode(taskId, editorialCodelUrl, editorialId);
+        for (const [index, codeUrl] of Object.entries(codeUrls)) {
+            const editorialCodelUrl = codesUrl + taskId + codeUrl;
+            const [additionalUrl, language] = codeUrl.split(".");
+            showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, editorialId);
+        }
     }
 }
 
@@ -234,7 +246,59 @@ function showTaskName(taskName, tag) {
     );
 }
 
-function showEditorial(taskId, url, tag) {
+// TODO: 複数の解説資料がアップロードされた日があれば更新する
+function getMultipleEditorialUrlsIfNeeds(taskId) {
+    // See:
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Working_with_Objects
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Property_Accessors
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/in
+
+    // タスク名: 解説ファイルの番号
+    // 0xx-yyy.jpgの0xxをキーに、-yyyを値としている
+    const multipleEditorialUrls = {
+        "005": ["-01", "-02", "-03"],
+        "011": ["-01", "-02"],
+        "017": ["-01", "-02", "-03"],
+        "023": ["-01", "-02", "-03", "-04"],
+        "029": ["-01", "-02"],
+        "035": ["-01", "-02", "-03"],
+        "041": ["-01", "-02", "-03"],
+        "047": ["-01", "-02"],
+        "053": ["-01", "-02", "-03", "-04"],
+    };
+
+    if (taskId in multipleEditorialUrls) {
+        return multipleEditorialUrls[taskId];
+    } else {
+        return [""]; // dummy
+    }
+}
+
+// TODO: 複数の想定コードがアップロードされた日があれば更新する
+function getMultipleCodeUrls(taskId) {
+    // タスク名: ソースコードの番号と拡張子
+    // 0xx-yyy.langの0xxをキーに、-yyy.langを値としている
+    const multipleCodeUrls = {
+        "005": ["-01.cpp", "-02.cpp", "-03.cpp"],
+        "011": ["-01.cpp", "-02.cpp", "-03.cpp"],
+        "017": ["-01.cpp", "-02.cpp", "-03.cpp"],
+        "023": ["-01.cpp", "-02.cpp", "-03.cpp", "-04a.cpp", "-04b.cpp"],
+        "029": ["-01.cpp", "-02.cpp", "-03.cpp"],
+        "035": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp"],
+        "041": ["-01a.cpp", "-01b.cpp", "-02.cpp", "-03.cpp"],
+        "047": ["-01.cpp", "-02.cpp"],
+        "053": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp"],
+        "055": [".cpp", "-02.py", "-03.py"],
+    };
+
+    if (taskId in multipleCodeUrls) {
+        return multipleCodeUrls[taskId];
+    } else {
+        return [".cpp"];
+    }
+}
+
+function showEditorial(taskId, url, additionalUrl, tag) {
     const ulClass = `editorial-${taskId}-ul`;
     const liClass = `editorial-${taskId}-li`;
 
@@ -251,15 +315,20 @@ function showEditorial(taskId, url, tag) {
     $("<a>", {
         class: `editorial-${taskId}-url`,
         href: url,
-        text: "公式解説",
+        text: `公式解説${additionalUrl}`,
         target: "_blank",
         rel: "noopener",
     }).appendTo(`.${liClass}`);
 }
 
-function showCode(taskId, url, tag) {
-    const ulClass = `editorial-${taskId}-ul`;
+function showCode(taskId, url, additionalUrl, tag) {
+    const ulClass = `editorial-${taskId}-code-ul`;
     const liClass = `editorial-${taskId}-code-li`;
+
+    $("<ul>", {
+        class: ulClass,
+        text: ""
+    }).appendTo(tag);
 
     $("<li>", {
         class: liClass,
@@ -269,7 +338,7 @@ function showCode(taskId, url, tag) {
     $("<a>", {
         class: `editorial-${taskId}-code-url`,
         href: url,
-        text: "想定ソースコード",
+        text: `想定ソースコード${additionalUrl}`,
         target: "_blank",
         rel: "noopener",
     }).appendTo(`.${liClass}`);
