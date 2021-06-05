@@ -73,6 +73,8 @@ function addEditorialPage() {
     showHeader(editorialID);
     addHorizontalRule(editorialID);
 
+    showDifficultyVotingAndUserCodes(editorialID);
+
     // TODO: 問題の一覧を取得
     // TODO: 問題名を動的に変更
     // TODO: 問題名に対応したURLを追加
@@ -108,10 +110,19 @@ function addTabContent() {
 }
 
 function showHeader(tag) {
-    $("<h2>", {
-        class: "editorial-header",
-        text: "解説"
-    }).appendTo(tag);
+    addHeader(
+        "<h2>", // heading_tag
+        "editorial-header", // className
+        "解説", // text
+        tag // parent_tag
+    );
+}
+
+function addHeader(heading_tag, className, text, parent_tag) {
+    $(heading_tag, {
+        class: className,
+        text: text,
+    }).appendTo(parent_tag);
 }
 
 function addHorizontalRule(tag) {
@@ -122,11 +133,105 @@ function addHorizontalRule(tag) {
     }).appendTo(tag);
 }
 
-function showTaskName(taskName, tag) {
-    $("<h3>", {
-        class: "task-name",
-        text: taskName,
+function showDifficultyVotingAndUserCodes(tag) {
+    addHeader(
+        "<h3>", // heading_tag
+        "difficulty-voting-and-user-codes", // className
+        "問題の難易度を投票する・ソースコードを共有する", // text
+        tag // parent_tag
+    );
+
+    $("<ul>", {
+        class: "spread-sheets-ul",
+        text: ""
     }).appendTo(tag);
+
+    const spreadSheetUrl = "https://docs.google.com/spreadsheets/d/1GG4Higis4n4GJBViVltjcbuNfyr31PzUY_ZY1zh2GuI/edit#gid=";
+
+    const homeID = "0";
+    addSpreadSheetHomeURL(spreadSheetUrl + homeID);
+
+    const difficultyVotingID = "1593175261";
+    addDifficultyVotingURL(spreadSheetUrl + difficultyVotingID);
+
+    const taskGroups = [
+        ["001", "023", spreadSheetUrl + "105162261"], // task start, task end, spread sheet id.
+        ["024", "047", spreadSheetUrl + "1671161250"],
+        ["048", "071", spreadSheetUrl + "671876031"],
+        ["072", "090", spreadSheetUrl + "428850451"]
+    ];
+
+    // See:
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+    taskGroups.forEach(
+        taskGroup => {
+            const taskStart = taskGroup[0];
+            const taskEnd = taskGroup[1];
+            const url = taskGroup[2];
+
+            addUserCodesURL(
+                taskStart,
+                taskEnd,
+                url
+            );
+        }
+    );
+}
+
+function addSpreadSheetHomeURL(url) {
+    $("<li>", {
+        class: "spread-sheet-home-li",
+        text: ""
+    }).appendTo(".spread-sheets-ul");
+
+    $("<a>", {
+        class: "spread-sheet-home-url",
+        href: url,
+        text: "目的",
+        target: "_blank",
+        rel: "noopener",
+    }).appendTo(".spread-sheet-home-li");
+}
+
+function addDifficultyVotingURL(url) {
+    $("<li>", {
+        class: "difficulty-voting-li",
+        text: ""
+    }).appendTo(".spread-sheets-ul");
+
+    $("<a>", {
+        class: "difficulty-voting-url",
+        href: url,
+        text: "問題の難易度を投票する",
+        target: "_blank",
+        rel: "noopener",
+    }).appendTo(".difficulty-voting-li");
+}
+
+function addUserCodesURL(taskStart, taskEnd, url) {
+    // See:
+    // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Template_literals
+    $("<li>", {
+        class: `user-codes-${taskStart}-${taskEnd}-li`,
+        text: ""
+    }).appendTo(".spread-sheets-ul");
+
+    $("<a>", {
+        class: `user-codes-${taskStart}-${taskEnd}-url`,
+        href: url,
+        text: `ソースコード(${taskStart}〜${taskEnd})を見る・共有する`,
+        target: "_blank",
+        rel: "noopener",
+    }).appendTo(`.user-codes-${taskStart}-${taskEnd}-li`);
+}
+
+function showTaskName(taskName, tag) {
+    addHeader(
+        "<h3>", // heading_tag
+        "task-name", // className
+        taskName, // text
+        tag // parent_tag
+    );
 }
 
 function showEditorials(url, tag) {
