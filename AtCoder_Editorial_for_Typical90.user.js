@@ -21,8 +21,6 @@
     const tasks = await fetchTasks(); // TODO: Use cache to reduce access to AtCoder.
     addEditorialPage(tasks);
 
-    //console.log(Object.keys(tasks).length);
-
     $(".nav-tabs a").click(function () {
         changeTab($(this));
         hideContentsOfPreviousPage();
