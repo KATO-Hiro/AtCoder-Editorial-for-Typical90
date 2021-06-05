@@ -13,12 +13,15 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-(function () {
+(async function () {
     "use strict";
 
     addTabContentStyles();
     addEditorialTab();
-    addEditorialPage();
+    const tasks = await fetchTasks(); // TODO: Use cache to reduce access to AtCoder.
+    addEditorialPage(tasks);
+
+    //console.log(Object.keys(tasks).length);
 
     $(".nav-tabs a").click(function () {
         changeTab($(this));
@@ -65,7 +68,52 @@ function addEditorialTab() {
     $("li.pull-right").before("<li><a href='#editorial-created-by-userscript'><span class='glyphicon glyphicon-book' style='margin-right:4px;' aria-hidden='true'></span>解説</a></li>");
 }
 
-function addEditorialPage() {
+// TODO: キャッシュを利用して、本家へのアクセスを少なくなるようにする
+async function fetchTasks() {
+    const tbodies = await fetchTaskPage();
+    const tasks = new Object();
+    let taskCount = 1;
+
+    for (const [index, aTag] of Object.entries($(tbodies).find("a"))) {
+        // Ignore a-tags including task-id and "Submit".
+        if (index % 3 == 1) {
+            const taskId = String(taskCount).padStart(3, "0");
+            tasks[taskId] = [aTag.text, aTag.href];
+            taskCount += 1;
+        }
+    }
+
+    return tasks;
+}
+
+async function fetchTaskPage() {
+    // See:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    // https://developer.mozilla.org/en-US/docs/Web/API/Body/text
+    // https://developer.mozilla.org/ja/docs/Web/API/DOMParser
+    // https://api.jquery.com/each/
+    // http://dyn-web.com/tutorials/object-literal/properties.php#:~:text=Add%20a%20Property%20to%20an%20Existing%20Object%20Literal&text=myObject.,if%20it%20is%20a%20string).
+    const tbodies = await fetch("https://atcoder.jp/contests/typical90/tasks", {
+        method: "GET"
+    })
+        .then(response => {
+            return response.text()
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const messages = doc.querySelector("#main-container > div.row > div:nth-child(2) > div > table > tbody");
+
+            return messages;
+        })
+        .catch(error => {
+            console.warn('Something went wrong.', error);
+        });
+
+    return tbodies;
+}
+
+function addEditorialPage(tasks) {
     addTabContent();
 
     const editorialId = "#editorial-created-by-userscript";
@@ -78,17 +126,15 @@ function addEditorialPage() {
     const editorialsUrl = githubRepoUrl + "editorial/";
     const codesUrl = githubRepoUrl + "sol/";
 
-    // TODO: 問題の一覧を取得
     // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
     // 問題によっては、複数の解説とソースコードが公開される日もある
     // getMultipleEditorialUrlsIfNeeds()とgetMultipleCodeUrls()で、アドホック的に対処している
-    for (let i = 1; i <= 90; i++ ) {
+    for (const [taskId, [taskName, taskUrl]] of Object.entries(tasks)) {
         // See:
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
         // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
-        const taskId = String(i).padStart(3, "0");
-        showTaskName(taskId, editorialId);
+        showTaskName(taskId, `${taskId} - ${taskName}`, editorialId);
 
         const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
 
@@ -237,10 +283,10 @@ function addUserCodesURL(taskStart, taskEnd, url) {
     }).appendTo(`.user-codes-${taskStart}-${taskEnd}-li`);
 }
 
-function showTaskName(taskName, tag) {
+function showTaskName(taskId, taskName, tag) {
     addHeader(
         "<h3>", // heading_tag
-        `task-${taskName}`, // className
+        `task-${taskId}`, // className
         taskName, // text
         tag // parent_tag
     );
