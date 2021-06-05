@@ -68,33 +68,33 @@ function addEditorialTab() {
 function addEditorialPage() {
     addTabContent();
 
-    const editorialID = "#editorial-created-by-userscript";
+    const editorialId = "#editorial-created-by-userscript";
 
-    showHeader(editorialID);
-    addHorizontalRule(editorialID);
-
-    showDifficultyVotingAndUserCodes(editorialID);
-
-    // TODO: 問題の一覧を取得
-    // TODO: 問題名を動的に変更
-    // TODO: 問題名に対応したURLを追加
-    const taskName = "FIXME: 問題名";
-    showTaskName(taskName, editorialID);
+    showHeader(editorialId);
+    addHorizontalRule(editorialId);
+    showDifficultyVotingAndUserCodes(editorialId);
 
     const githubRepoUrl = "https://github.com/E869120/kyopro_educational_90/blob/main/";
-
-    // TODO: 問題解説のURLを動的に変更
-    // TODO: 問題解説のJPEGファイルを表示
     const editorialsUrl = githubRepoUrl + "editorial/";
-    const EditorialUrl = editorialsUrl + "053-04" + ".jpg";
-    showEditorials(EditorialUrl, editorialID);
+    const codesUrl = githubRepoUrl + "sol/";
 
-    // TODO: ソースコードをフォーマットされた状態で表示する
+    // TODO: 問題の一覧を取得
     // TODO: 問題によっては、複数の解説とソースコードのファイルがあるので対処
     // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
-    const CodesUrl = githubRepoUrl + "sol/";
-    const editoriaCodelUrl = CodesUrl + "053-04" + ".cpp";
-    showCodes(editoriaCodelUrl, editorialID);
+    for (let i = 1; i <= 90; i++ ) {
+        // See:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+        const taskId = String(i).padStart(3, "0");
+        showTaskName(taskId, editorialId);
+
+        // TODO: AtCoderの解説ページで図を表示できるようにする
+        const editorialUrl = editorialsUrl + taskId + ".jpg";
+        showEditorial(taskId, editorialUrl, editorialId);
+
+        // TODO: ソースコードをフォーマットされた状態で表示する
+        const editorialCodelUrl = codesUrl + taskId + ".cpp";
+        showCode(taskId, editorialCodelUrl, editorialId);
+    }
 }
 
 function addTabContent() {
@@ -228,45 +228,51 @@ function addUserCodesURL(taskStart, taskEnd, url) {
 function showTaskName(taskName, tag) {
     addHeader(
         "<h3>", // heading_tag
-        "task-name", // className
+        `task-${taskName}`, // className
         taskName, // text
         tag // parent_tag
     );
 }
 
-function showEditorials(url, tag) {
+function showEditorial(taskId, url, tag) {
+    const ulClass = `editorial-${taskId}-ul`;
+    const liClass = `editorial-${taskId}-li`;
+
     $("<ul>", {
-        class: "editorial-ul",
+        class: ulClass,
         text: ""
     }).appendTo(tag);
 
     $("<li>", {
-        class: "editorial-li",
+        class: liClass,
         text: ""
-    }).appendTo(".editorial-ul");
+    }).appendTo(`.${ulClass}`);
 
     $("<a>", {
-        class: "editorial-url",
+        class: `editorial-${taskId}-url`,
         href: url,
         text: "公式解説",
         target: "_blank",
         rel: "noopener",
-    }).appendTo(".editorial-li");
+    }).appendTo(`.${liClass}`);
 }
 
-function showCodes(url, tag) {
+function showCode(taskId, url, tag) {
+    const ulClass = `editorial-${taskId}-ul`;
+    const liClass = `editorial-${taskId}-code-li`;
+
     $("<li>", {
-        class: "editorial-code-li",
+        class: liClass,
         text: ""
-    }).appendTo(".editorial-ul");
+    }).appendTo(`.${ulClass}`);
 
     $("<a>", {
-        class: "editorial-code-url",
+        class: `editorial-${taskId}-code-url`,
         href: url,
         text: "想定ソースコード",
         target: "_blank",
         rel: "noopener",
-    }).appendTo(".editorial-code-li");
+    }).appendTo(`.${liClass}`);
 }
 
 function addEditorialButtonToTaskPage() {
