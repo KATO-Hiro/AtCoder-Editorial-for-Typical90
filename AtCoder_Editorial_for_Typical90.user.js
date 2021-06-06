@@ -2,7 +2,7 @@
 // @name         AtCoder Editorial for Typical90
 // @namespace    http://tampermonkey.net/
 // @version      0.1.0
-// @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどを表示します。
+// @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // @author       hiro_hiro
@@ -28,22 +28,7 @@
         return false;
     });
 
-    const current_url = window.location.href;
-
-    if (current_url.match("/atcoder.jp\/contests\/typical90\/tasks\/typical90_*")) {
-        const $editorialButton = addEditorialButtonToTaskPage();
-
-        if (!$editorialButton) return;
-
-        // See:
-        // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-        $editorialButton.addEventListener("click", async e => {
-            e.preventDefault();
-
-            console.log("called!");
-            // TODO: ボタンをクリックすると、解説ページが表示される
-        });
-    }
+    // TODO: 「解説」ボタンをクリックしたら、該当する問題のリンクを表示できるようにする
 })();
 
 function addTabContentStyles() {
@@ -94,19 +79,19 @@ async function fetchTaskPage() {
     const tbodies = await fetch("https://atcoder.jp/contests/typical90/tasks", {
         method: "GET"
     })
-        .then(response => {
-            return response.text()
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const messages = doc.querySelector("#main-container > div.row > div:nth-child(2) > div > table > tbody");
+    .then(response => {
+        return response.text()
+    })
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const messages = doc.querySelector("#main-container > div.row > div:nth-child(2) > div > table > tbody");
 
-            return messages;
-        })
-        .catch(error => {
-            console.warn('Something went wrong.', error);
-        });
+        return messages;
+    })
+    .catch(error => {
+        console.warn('Something went wrong.', error);
+    });
 
     return tbodies;
 }
@@ -124,31 +109,43 @@ function addEditorialPage(tasks) {
     const editorialsUrl = githubRepoUrl + "editorial/";
     const codesUrl = githubRepoUrl + "sol/";
 
-    // TODO: 問題の投稿当日に解説・ソースコードがない場合のmsgを追加
-    // 問題によっては、複数の解説とソースコードが公開される日もある
+    // See:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+    const latestTaskId = Object.keys(tasks).slice(-1)[0];
+
+    // HACK: 公開当日分の問題についてはリンク切れを回避するため、解説・ソースコードの一覧を示すことで応急的に対処
+    // HACK: 問題によっては、複数の解説とソースコードが公開される日もある
     // getMultipleEditorialUrlsIfNeeds()とgetMultipleCodeUrls()で、アドホック的に対処している
     for (const [taskId, [taskName, taskUrl]] of Object.entries(tasks)) {
         // See:
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
         // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
-        showTaskName(taskId, `${taskId} - ${taskName}`, editorialId);
+        showTaskName(taskId, `${taskId} - ${taskName}`, taskUrl, editorialId);
 
-        const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
+        if (taskId == latestTaskId) {
+            const message = "注: 閲覧する時間帯によっては、公式解説・想定ソースコードが公開されているかもしれません。しばらくお待ちください。";
+            const additionalUrl = "(一覧)";
+            addNote(message, editorialId);
+            showEditorial(taskId, editorialsUrl, additionalUrl, editorialId);
+            showCode(taskId, codesUrl, additionalUrl, editorialId);
+        } else {
+            const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
 
-        // TODO: AtCoderの解説ページで図を表示できるようにする
-        for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
-            const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
-            showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, editorialId);
-        }
+            // TODO: AtCoderの解説ページで図を表示できるようにする
+            for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
+                const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
+                showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, editorialId);
+            }
 
-        const codeUrls = getMultipleCodeUrls(taskId);
+            const codeUrls = getMultipleCodeUrls(taskId);
 
-        // TODO: ソースコードをフォーマットされた状態で表示する
-        for (const [index, codeUrl] of Object.entries(codeUrls)) {
-            const editorialCodelUrl = codesUrl + taskId + codeUrl;
-            const [additionalUrl, language] = codeUrl.split(".");
-            showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, editorialId);
+            // TODO: ソースコードをフォーマットされた状態で表示する
+            for (const [index, codeUrl] of Object.entries(codeUrls)) {
+                const editorialCodelUrl = codesUrl + taskId + codeUrl;
+                const [additionalUrl, language] = codeUrl.split(".");
+                showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, editorialId);
+            }
         }
     }
 }
@@ -281,13 +278,21 @@ function addUserCodesURL(taskStart, taskEnd, url) {
     }).appendTo(`.user-codes-${taskStart}-${taskEnd}-li`);
 }
 
-function showTaskName(taskId, taskName, tag) {
+function showTaskName(taskId, taskName, taskUrl, tag) {
+    const taskIdClass = `task-${taskId}`;
+
     addHeader(
         "<h3>", // heading_tag
-        `task-${taskId}`, // className
+        taskIdClass, // className
         taskName, // text
         tag // parent_tag
     );
+
+    $("<a>", {
+        class: `${`task-${taskId}-url`} small glyphicon glyphicon-new-window`,
+        href: taskUrl,
+        target: "_blank",
+    }).appendTo(`.${taskIdClass}`);
 }
 
 // TODO: 複数の解説資料がアップロードされた日があれば更新する
@@ -340,6 +345,13 @@ function getMultipleCodeUrls(taskId) {
     } else {
         return [".cpp"];
     }
+}
+
+function addNote(message, parent_tag) {
+    $("<p>", {
+        class: "no-editorial",
+        text: message,
+    }).appendTo(parent_tag);
 }
 
 function showEditorial(taskId, url, additionalUrl, tag) {
