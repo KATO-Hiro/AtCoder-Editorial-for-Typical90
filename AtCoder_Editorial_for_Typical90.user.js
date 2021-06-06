@@ -105,49 +105,9 @@ function addEditorialPage(tasks) {
     addHorizontalRule(editorialId);
     showDifficultyVotingAndUserCodes(editorialId);
 
-    const githubRepoUrl = "https://github.com/E869120/kyopro_educational_90/blob/main/";
-    const editorialsUrl = githubRepoUrl + "editorial/";
-    const codesUrl = githubRepoUrl + "sol/";
-
-    // See:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
-    const latestTaskId = Object.keys(tasks).slice(-1)[0];
-
-    // HACK: 公開当日分の問題についてはリンク切れを回避するため、解説・ソースコードの一覧を示すことで応急的に対処
-    // HACK: 問題によっては、複数の解説とソースコードが公開される日もある
-    // getMultipleEditorialUrlsIfNeeds()とgetMultipleCodeUrls()で、アドホック的に対処している
-    for (const [taskId, [taskName, taskUrl]] of Object.entries(tasks)) {
-        // See:
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
-        // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
-        showTaskName(taskId, `${taskId} - ${taskName}`, taskUrl, editorialId);
-
-        if (taskId == latestTaskId) {
-            const message = "注: 閲覧する時間帯によっては、公式解説・想定ソースコードが公開されているかもしれません。しばらくお待ちください。";
-            const additionalUrl = "(一覧)";
-            addNote(message, editorialId);
-            showEditorial(taskId, editorialsUrl, additionalUrl, editorialId);
-            showCode(taskId, codesUrl, additionalUrl, editorialId);
-        } else {
-            const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
-
-            // TODO: AtCoderの解説ページで図を表示できるようにする
-            for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
-                const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
-                showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, editorialId);
-            }
-
-            const codeUrls = getMultipleCodeUrls(taskId);
-
-            // TODO: ソースコードをフォーマットされた状態で表示する
-            for (const [index, codeUrl] of Object.entries(codeUrls)) {
-                const editorialCodelUrl = codesUrl + taskId + codeUrl;
-                const [additionalUrl, language] = codeUrl.split(".");
-                showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, editorialId);
-            }
-        }
-    }
+    let taskEditorialsDiv = addDiv("task-editorials", editorialId);
+    taskEditorialsDiv = "." + taskEditorialsDiv;
+    addEditorials(tasks, taskEditorialsDiv);
 }
 
 function addTabContent() {
@@ -276,6 +236,63 @@ function addUserCodesURL(taskStart, taskEnd, url) {
         target: "_blank",
         rel: "noopener",
     }).appendTo(`.user-codes-${taskStart}-${taskEnd}-li`);
+}
+
+function addDiv(tagName, parentTag) {
+    $("<div>", {
+        class: tagName,
+    }).appendTo(parentTag);
+
+    return tagName;
+}
+
+function addEditorials(tasks, parentTag) {
+    const githubRepoUrl = "https://github.com/E869120/kyopro_educational_90/blob/main/";
+    const editorialsUrl = githubRepoUrl + "editorial/";
+    const codesUrl = githubRepoUrl + "sol/";
+
+    // See:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
+    const latestTaskId = Object.keys(tasks).slice(-1)[0];
+
+    // HACK: 公開当日分の問題についてはリンク切れを回避するため、解説・ソースコードの一覧を示すことで応急的に対処
+    // HACK: 問題によっては、複数の解説とソースコードが公開される日もある
+    // getMultipleEditorialUrlsIfNeeds()とgetMultipleCodeUrls()で、アドホック的に対処している
+    for (const [taskId, [taskName, taskUrl]] of Object.entries(tasks)) {
+        let taskEditorialDiv = addDiv(`task-${taskId}-editorial`, parentTag);
+        taskEditorialDiv = "." + taskEditorialDiv;
+
+        // See:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+        // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
+        showTaskName(taskId, `${taskId} - ${taskName}`, taskUrl, taskEditorialDiv);
+
+        if (taskId == latestTaskId) {
+            const message = "注: 閲覧する時間帯によっては、公式解説・想定ソースコードが公開されているかもしれません。しばらくお待ちください。";
+            const additionalUrl = "(一覧)";
+            addNote(message, taskEditorialDiv);
+            showEditorial(taskId, editorialsUrl, additionalUrl, taskEditorialDiv);
+            showCode(taskId, codesUrl, additionalUrl, taskEditorialDiv);
+        } else {
+            const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
+
+            // TODO: AtCoderの解説ページで図を表示できるようにする
+            for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
+                const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
+                showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, taskEditorialDiv);
+            }
+
+            const codeUrls = getMultipleCodeUrls(taskId);
+
+            // TODO: ソースコードをフォーマットされた状態で表示する
+            for (const [index, codeUrl] of Object.entries(codeUrls)) {
+                const editorialCodelUrl = codesUrl + taskId + codeUrl;
+                const [additionalUrl, language] = codeUrl.split(".");
+                showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, taskEditorialDiv);
+            }
+        }
+    }
 }
 
 function showTaskName(taskId, taskName, taskUrl, tag) {
