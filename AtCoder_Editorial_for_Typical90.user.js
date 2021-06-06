@@ -314,6 +314,7 @@ function getMultipleEditorialUrlsIfNeeds(taskId) {
         "041": ["-01", "-02", "-03"],
         "047": ["-01", "-02"],
         "053": ["-01", "-02", "-03", "-04"],
+        "059": ["-01", "-02", "-03"],
     };
 
     if (taskId in multipleEditorialUrls) {
@@ -338,6 +339,7 @@ function getMultipleCodeUrls(taskId) {
         "047": ["-01.cpp", "-02.cpp"],
         "053": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp"],
         "055": [".cpp", "-02.py", "-03.py"],
+        "059": ["-01.cpp", "-02.cpp"],
     };
 
     if (taskId in multipleCodeUrls) {
