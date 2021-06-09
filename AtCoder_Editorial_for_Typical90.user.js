@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    http://tampermonkey.net/
-// @version      0.1.0
+// @version      0.1.1
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -79,19 +79,19 @@ async function fetchTaskPage() {
     const tbodies = await fetch("https://atcoder.jp/contests/typical90/tasks", {
         method: "GET"
     })
-    .then(response => {
-        return response.text()
-    })
-    .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const messages = doc.querySelector("#main-container > div.row > div:nth-child(2) > div > table > tbody");
+        .then(response => {
+            return response.text()
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const messages = doc.querySelector("#main-container > div.row > div:nth-child(2) > div > table > tbody");
 
-        return messages;
-    })
-    .catch(error => {
-        console.warn('Something went wrong.', error);
-    });
+            return messages;
+        })
+        .catch(error => {
+            console.warn('Something went wrong.', error);
+        });
 
     return tbodies;
 }
