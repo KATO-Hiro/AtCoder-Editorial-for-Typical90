@@ -357,6 +357,7 @@ function getMultipleCodeUrls(taskId) {
         "053": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp"],
         "055": [".cpp", "-02.py", "-03.py"],
         "059": ["-01.cpp", "-02.cpp"],
+        "061": ["-01.cpp", "-02.cpp"],
     };
 
     if (taskId in multipleCodeUrls) {
