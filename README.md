@@ -10,16 +10,18 @@
 
 <div align="center">
 
-  ![](images/demo.png)
+  ![](images/demo_latest_task.png)
+  ![](images/demo_editorial.png)
 
 </div>
 
 ## 機能
 
-普段のコンテストの「解説」タブと、ほぼ同じ仕様です。
+- [競プロ典型 90 問](https://atcoder.jp/contests/typical90)に、「新着」タブと「解説」タブを追加
+  - 「解説」タブに関しては、普段のコンテストとほぼ同じ仕様です。
 
-- [競プロ典型 90 問](https://atcoder.jp/contests/typical90)に、解説タブを追加
-
+- 新着タブに、[GitHub](https://github.com/E869120/kyopro_educational_90)で公開されている最新の問題、サンプルへのリンクを追加
+  - コンテスト開催期間の平日と土曜日の08:00(日本標準時)に更新
 - 解説タブに、以下のリンクを追加
   - [非公式難易度表・ソースコード共有](https://docs.google.com/spreadsheets/d/1GG4Higis4n4GJBViVltjcbuNfyr31PzUY_ZY1zh2GuI/edit#gid=0)へのリンク
   - 各問題のリンク
