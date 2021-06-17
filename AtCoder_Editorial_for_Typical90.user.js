@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    http://tampermonkey.net/
-// @version      0.3.2
+// @version      0.3.3
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -594,6 +594,7 @@ function getMultipleCodeUrls(taskId) {
         "061": ["-01.cpp", "-02.cpp"],
         "065": ["-01.cpp", "-02.cpp", "-03.cpp"],
         "066": ["a.cpp", "b.cpp"],
+        "068": ["a.cpp", "b.cpp"],
     };
 
     if (taskId in multipleCodeUrls) {
