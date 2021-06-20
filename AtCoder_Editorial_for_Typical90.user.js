@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
-// @namespace    http://tampermonkey.net/
-// @version      0.3.3
+// @namespace    https://github.com/KATO-Hiro
+// @version      0.3.4
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -10,7 +10,8 @@
 // @license      CC0
 // @downloadURL
 // @updateURL
-// @supportURL
+// @homepage     https://github.com/KATO-Hiro/AtCoder-Editorial-for-Typical90
+// @supportURL   https://github.com/KATO-Hiro/AtCoder-Editorial-for-Typical90/issues
 // @grant        GM_addStyle
 // ==/UserScript==
 
@@ -566,6 +567,7 @@ function getMultipleEditorialUrlsIfNeeds(taskId) {
         "053": ["-01", "-02", "-03", "-04"],
         "059": ["-01", "-02", "-03"],
         "065": ["-01", "-02", "-03"],
+        "071": ["-01", "-02", "-03"],
     };
 
     if (taskId in multipleEditorialUrls) {
@@ -595,6 +597,7 @@ function getMultipleCodeUrls(taskId) {
         "065": ["-01.cpp", "-02.cpp", "-03.cpp"],
         "066": ["a.cpp", "b.cpp"],
         "068": ["a.cpp", "b.cpp"],
+        "071": ["-02.cpp", "-03.cpp"],
     };
 
     if (taskId in multipleCodeUrls) {
