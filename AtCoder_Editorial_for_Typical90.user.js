@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    https://github.com/KATO-Hiro
-// @version      0.3.10
+// @version      0.4.0
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -301,7 +301,9 @@ async function fetchTasks() {
 
     for (const [index, aTag] of Object.entries($(tbodies).find("a"))) {
         // Ignore a-tags including task-id and "Submit".
-        if (index % 3 == 1) {
+        // See:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes
+        if (index % 3 == 1 && aTag.text.includes("★")) {
             const taskId = String(taskCount).padStart(3, "0");
             tasks[taskId] = [aTag.text, aTag.href];
             taskCount += 1;
