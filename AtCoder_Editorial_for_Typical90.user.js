@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    https://github.com/KATO-Hiro
-// @version      0.4.5
+// @version      0.5.0
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -498,29 +498,21 @@ function addEditorials(tasks, parentTag) {
         // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
         showTaskName(taskId, `${taskId} - ${taskName}`, taskUrl, taskEditorialDiv);
 
-        if (taskId == latestTaskId) {
-            const message = "注: 閲覧する時間帯によっては、公式解説・想定ソースコードが公開されているかもしれません。しばらくお待ちください。";
-            const additionalUrl = "(一覧)";
-            addNote("no-editorial", message, taskEditorialDiv);
-            showEditorial(taskId, editorialsUrl, additionalUrl, taskEditorialDiv);
-            showCode(taskId, codesUrl, additionalUrl, taskEditorialDiv);
-        } else {
-            const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
+        const additionalUrls = getMultipleEditorialUrlsIfNeeds(taskId);
 
-            // TODO: AtCoderの解説ページで図を表示できるようにする
-            for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
-                const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
-                showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, taskEditorialDiv);
-            }
+        // TODO: AtCoderの解説ページで図を表示できるようにする
+        for (const [index, additionalUrl] of Object.entries(additionalUrls)) {
+            const editorialUrl = editorialsUrl + taskId + additionalUrl + ".jpg";
+            showEditorial(taskId + additionalUrl, editorialUrl, additionalUrl, taskEditorialDiv);
+        }
 
-            const codeUrls = getMultipleCodeUrls(taskId);
+        const codeUrls = getMultipleCodeUrls(taskId);
 
-            // TODO: ソースコードをフォーマットされた状態で表示する
-            for (const [index, codeUrl] of Object.entries(codeUrls)) {
-                const editorialCodelUrl = codesUrl + taskId + codeUrl;
-                const [additionalUrl, language] = codeUrl.split(".");
-                showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, taskEditorialDiv);
-            }
+        // TODO: ソースコードをフォーマットされた状態で表示する
+        for (const [index, codeUrl] of Object.entries(codeUrls)) {
+            const editorialCodelUrl = codesUrl + taskId + codeUrl;
+            const [additionalUrl, language] = codeUrl.split(".");
+            showCode(taskId + additionalUrl, editorialCodelUrl, codeUrl, taskEditorialDiv);
         }
     }
 }
