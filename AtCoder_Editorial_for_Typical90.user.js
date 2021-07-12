@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    https://github.com/KATO-Hiro
-// @version      0.4.4
+// @version      0.4.5
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -578,6 +578,7 @@ function getMultipleEditorialUrlsIfNeeds(taskId) {
         "087": ["-01", "-02"],
         "088": ["-01", "-02"],
         "089": ["-01", "-02", "-03", "-04"],
+        "090": ["-01", "-02", "-03", "-04", "-05", "-06"],
     };
 
     if (taskId in multipleEditorialUrls) {
@@ -614,6 +615,7 @@ function getMultipleCodeUrls(taskId) {
         "083": ["-01.cpp", "-02a.cpp", "-02b.cpp"],
         "084": ["-01.cpp", "-02.cpp"],
         "089": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp", "-05.cpp"],
+        "090": ["-01.cpp", "-02.cpp", "-03.cpp", "-04.cpp", "-05.cpp", "-06a.cpp", "-06b.cpp", "-07a.cpp", "-07b.cpp"],
     };
 
     if (taskId in multipleCodeUrls) {
