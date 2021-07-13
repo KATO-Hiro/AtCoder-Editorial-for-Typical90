@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AtCoder Editorial for Typical90
 // @namespace    https://github.com/KATO-Hiro
-// @version      0.5.0
+// @version      0.6.0
 // @description  AtCoder「競プロ典型 90 問」に解説タブを追加し、E869120さんがGitHubで公開されている問題の解説・想定ソースコードなどのリンクを表示します。
 // @match        https://atcoder.jp/contests/typical90*
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
@@ -20,8 +20,6 @@
 
     addTabs();
 
-    addLatestTaskPage();
-
     const tasks = await fetchTasks(); // TODO: Use cache to reduce access to AtCoder.
     addEditorialPage(tasks);
 
@@ -38,7 +36,6 @@
 function addTabs() {
     addTabContentStyles();
     addTabContents();
-    addLatestTaskTab();
     addEditorialTab();
 }
 
@@ -62,7 +59,6 @@ function addTabContents() {
     // https://stackoverflow.com/questions/268490/jquery-document-createelement-equivalent
     // https://blog.toshimaru.net/jqueryhidden-inputjquery/
     const idNames = [
-        "latest-task-created-by-userscript",
         "editorial-created-by-userscript"
     ];
 
@@ -74,28 +70,6 @@ function addTabContents() {
     }
 }
 
-// FIXME: Hard code is not good.
-function addLatestTaskTab() {
-    const parentTag = document.getElementsByClassName("nav nav-tabs")[0];
-    const liNode = document.createElement("li");
-    parentTag.insertBefore(liNode, parentTag.children[1]);
-
-    const idName = "#latest-task-created-by-userscript";
-    const aClass = "latest-task-a";
-
-    $("<a>", {
-        class: aClass,
-        href: idName,
-    }).appendTo(liNode);
-
-    $("<span>", {
-        class: "glyphicon glyphicon-star",
-        text: "新着",
-        style: "margin-right:4px;",
-        "aria-hidden": true,
-    }).appendTo(`.${aClass}`);
-}
-
 // FIXME: Hard coding is not good.
 function addEditorialTab() {
     // See:
@@ -103,194 +77,10 @@ function addEditorialTab() {
     $("li.pull-right").before("<li><a href='#editorial-created-by-userscript'><span class='glyphicon glyphicon-book' style='margin-right:4px;' aria-hidden='true'></span>解説</a></li>");
 }
 
-function addLatestTaskPage() {
-    const latestTaskId = "#latest-task-created-by-userscript";
-
-    showHeader("latest-task-header", "新着", latestTaskId);
-    addHorizontalRule(latestTaskId);
-
-    const message = `注: コンテスト開催期間の平日と土曜日の08:00(日本標準時)に更新されます。`;
-    addNote("latest-task-message", message, latestTaskId);
-
-    const taskId = getTodayTaskId();
-    const taskIdPaddingZero = padZero(taskId);
-    addLatestTaskHeader(taskIdPaddingZero, latestTaskId);
-
-    const ulName = "latest-task-ul";
-
-    $("<ul>", {
-        class: ulName,
-        text: ""
-    }).appendTo(latestTaskId);
-
-    const githubRepoUrl = getGitHubRepoUrl();
-    const latestTaskWithImageUrl = githubRepoUrl + "problem/" + taskIdPaddingZero + ".jpg";
-    const latestTaskUrl = githubRepoUrl + "problem-txt/" + taskIdPaddingZero + ".txt";
-    const latestTaskSampleUrl = githubRepoUrl + "sample/" + taskIdPaddingZero + ".txt";
-    addLatestTask(latestTaskWithImageUrl, latestTaskUrl, ulName);
-    addSample(latestTaskSampleUrl, ulName);
-}
-
-function addLatestTaskHeader(taskId, parentTag) {
-    addHeader(
-        "<h3>", // heading_tag
-        "latest-task", // className
-        `問題 ${taskId}`, // text
-        parentTag
-    );
-}
-
 function padZero(taskId) {
     // See:
     // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
     return String(taskId).padStart(3, '0');
-}
-
-function addLatestTask(latestTaskWithImageUrl, latestTaskUrl, parentTag) {
-    const taskWithImage = "latest-task-with-image-li";
-
-    $("<li>", {
-        class: taskWithImage,
-        text: ""
-    }).appendTo(`.${parentTag}`);
-
-    $("<a>", {
-        class: "latest-task-image-url",
-        href: latestTaskWithImageUrl,
-        text: "問題文 + 画像",
-        target: "_blank",
-        rel: "noopener",
-    }).appendTo(`.${taskWithImage}`);
-
-    const task = "latest-task-li";
-
-    $("<li>", {
-        class: task,
-        text: ""
-    }).appendTo(`.${parentTag}`);
-    $("<a>", {
-        class: "latest-task-text-url",
-        href: latestTaskUrl,
-        text: "問題文のみ",
-        target: "_blank",
-        rel: "noopener",
-    }).appendTo(`.${task}`);
-}
-
-function addSample(url, parentTag) {
-    const liName = "latest-task-sample-li";
-
-    $("<li>", {
-        class: liName,
-        text: ""
-    }).appendTo(`.${parentTag}`);
-
-    $("<a>", {
-        class: "latest-task-sample-url",
-        href: url,
-        text: "サンプル(入力形式、入出力例)",
-        target: "_blank",
-        rel: "noopener",
-    }).appendTo(`.${liName}`);
-}
-
-function getTodayTaskId() {
-    // See:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
-    const today = getToday();
-    const startDay = getStartDay();
-    let taskCount = today.diff(startDay, "day") + 1;
-    taskCount -= countSunday(today);
-
-    if (!isSunday(today) && (isBeforeAmEight(today))) {
-        taskCount -= 1
-    }
-
-    const maxTaskId = 90;
-    taskCount = Math.min(taskCount, maxTaskId);
-
-    return taskCount;
-}
-
-// See:
-// https://day.js.org/en/
-function getToday() {
-    const today = dayjs();
-
-    return today;
-}
-
-function getStartDay() {
-    const startDay = dayjs("2021-03-30");
-
-    return startDay;
-}
-
-function getEndDay() {
-    const endDay = dayjs("2021-07-12");
-
-    return endDay;
-}
-
-function countSunday(today) {
-    const sundays = getSundays();
-    let count = 0;
-
-    for (const sunday of sundays) {
-        if (today.isAfter(sunday)) {
-            count += 1;
-        }
-    }
-
-    return count;
-}
-
-function getSundays() {
-    const sundays = [
-        dayjs("2021-04-04"),
-        dayjs("2021-04-11"),
-        dayjs("2021-04-18"),
-        dayjs("2021-04-25"),
-        dayjs("2021-05-02"),
-        dayjs("2021-05-09"),
-        dayjs("2021-05-16"),
-        dayjs("2021-05-23"),
-        dayjs("2021-05-30"),
-        dayjs("2021-06-06"),
-        dayjs("2021-06-13"),
-        dayjs("2021-06-20"),
-        dayjs("2021-06-27"),
-        dayjs("2021-07-04"),
-        dayjs("2021-07-11"),
-    ];
-
-    return sundays;
-}
-
-function isSunday(today) {
-    const sunday = 0;
-
-    if (today.day() == sunday) {
-        return true;
-    } else {
-        return false
-    }
-}
-
-function isBeforeAmEight(today) {
-    const todayHour = today.hour();
-    const todayMinute = today.minute();
-
-    const year = today.year();
-    const month = today.month() + 1; // 0-indexed.
-    const date = today.date();
-    const amEight = dayjs(`${year}-${month}-${date}T08:00`);
-
-    if (today.isBefore(amEight)) {
-        return true
-    } else {
-        false
-    }
 }
 
 // TODO: キャッシュを利用して、本家へのアクセスを少なくなるようにする
